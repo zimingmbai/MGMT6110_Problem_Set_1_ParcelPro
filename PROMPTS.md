@@ -64,7 +64,10 @@ Make the following edits
 
 Change nothing else. If you make a choice I did not specify, say so in one line rather than burying it.
 ```
-**What came back:** Correct, one file touched.
+**What came back:** Changes are roughly what was required
+- Scroll-Wheel added > But also added a "Scroll wheel enabled" indicator, which is redundant
+- Live Date/Time is added
+- A more seamless map is added > This seems to be considerably difficult as the visual interpretations might not be sufficient with prompts.
 **What I changed next and why:** Nothing. Moved to the next item on the Goal list.
 
 ---
