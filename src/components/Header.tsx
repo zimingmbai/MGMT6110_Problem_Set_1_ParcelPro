@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Manager } from '../types';
-import { Truck, Map, ArrowRightLeft, Users, ShieldCheck } from 'lucide-react';
+import { Truck, Map, ArrowRightLeft, Users, Clock } from 'lucide-react';
 
 interface HeaderProps {
   managers: Manager[];
@@ -19,6 +19,29 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectScreen,
   totalDelayed,
 }) => {
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedDate = currentTime.toLocaleDateString('en-SG', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  const formattedTime = currentTime.toLocaleTimeString('en-SG', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  });
+
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-900 text-white border-b border-slate-800 shadow-md">
       {/* Top Brand Bar */}
@@ -43,40 +66,60 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Screen Switcher Navigation Tabs */}
-        <div className="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700">
-          <button
-            id="nav-tab-map-screen"
-            type="button"
-            onClick={() => onSelectScreen('map')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all min-h-[40px] ${
-              activeScreen === 'map'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm font-bold'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-            }`}
+        {/* Right Section: Live Date & Time + Navigation Switcher */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 ml-auto sm:ml-0">
+          {/* Live Date / Time Badge */}
+          <div
+            id="header-live-datetime"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs text-slate-300 shadow-2xs"
+            title="Live Singapore Operations Clock"
           >
-            <Map className="h-4 w-4" />
-            <span>Singapore Map</span>
-          </button>
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
+              <Clock className="h-3.5 w-3.5 animate-pulse" />
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1.5 text-[11px] sm:text-xs">
+              <span className="font-semibold text-slate-200">{formattedDate}</span>
+              <span className="hidden sm:inline text-slate-500">•</span>
+              <span className="font-mono text-emerald-400 font-bold">{formattedTime}</span>
+              <span className="text-[9px] uppercase tracking-wider text-slate-400">SGT</span>
+            </div>
+          </div>
 
-          <button
-            id="nav-tab-dispatch-screen"
-            type="button"
-            onClick={() => onSelectScreen('dispatch')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all min-h-[40px] ${
-              activeScreen === 'dispatch'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm font-bold'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-            }`}
-          >
-            <ArrowRightLeft className="h-4 w-4" />
-            <span>Reassignment Hub</span>
-            {totalDelayed > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white text-[11px] font-bold">
-                {totalDelayed}
-              </span>
-            )}
-          </button>
+          {/* Screen Switcher Navigation Tabs */}
+          <div className="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700">
+            <button
+              id="nav-tab-map-screen"
+              type="button"
+              onClick={() => onSelectScreen('map')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all min-h-[40px] ${
+                activeScreen === 'map'
+                  ? 'bg-emerald-500 text-slate-950 shadow-sm font-bold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              <Map className="h-4 w-4" />
+              <span>Singapore Map</span>
+            </button>
+
+            <button
+              id="nav-tab-dispatch-screen"
+              type="button"
+              onClick={() => onSelectScreen('dispatch')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all min-h-[40px] ${
+                activeScreen === 'dispatch'
+                  ? 'bg-emerald-500 text-slate-950 shadow-sm font-bold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              <ArrowRightLeft className="h-4 w-4" />
+              <span>Reassignment Hub</span>
+              {totalDelayed > 0 && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white text-[11px] font-bold">
+                  {totalDelayed}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

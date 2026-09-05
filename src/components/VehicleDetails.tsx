@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Vehicle, Delivery } from '../types';
 import {
   Car,
@@ -14,6 +14,9 @@ import {
   CheckCircle2,
   Share2,
   Info,
+  ChevronLeft,
+  ChevronRight,
+  Disc,
 } from 'lucide-react';
 
 interface VehicleDetailsProps {
@@ -37,21 +40,90 @@ export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
   const deliveryCount = vehicle.deliveries.length;
   const isFull = deliveryCount >= 10;
 
+  const pillContainerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll wheel horizontal scrolling listener
+  useEffect(() => {
+    const el = pillContainerRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      // If user scrolls mouse wheel over the pill bar, scroll it horizontally
+      if (e.deltaY !== 0 || e.deltaX !== 0) {
+        const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+        el.scrollLeft += delta;
+        e.preventDefault();
+      }
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
+  const handleScrollLeft = () => {
+    if (pillContainerRef.current) {
+      pillContainerRef.current.scrollBy({ left: -220, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (pillContainerRef.current) {
+      pillContainerRef.current.scrollBy({ left: 220, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div
       id={`vehicle-details-${vehicle.id}`}
       className="w-full rounded-2xl bg-white border border-slate-200 shadow-sm p-4 sm:p-6 transition-all"
     >
-      {/* 10-Vehicle Quick Switcher Carousel */}
+      {/* 10-Vehicle Quick Switcher Carousel with Scroll Wheel */}
       <div className="mb-5 pb-4 border-b border-slate-100">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Manager Fleet Vehicles (10 Vans)
-          </span>
-          <span className="text-xs text-slate-400">Tap to view van</span>
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              Manager Fleet Vehicles (10 Vans)
+            </span>
+            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-medium text-slate-500">
+              <Disc className="h-3 w-3 text-emerald-600 animate-spin" style={{ animationDuration: '6s' }} />
+              <span>Scroll wheel enabled</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-slate-400 hidden sm:inline mr-1">
+              Scroll wheel ⇄ or click arrows
+            </span>
+            <button
+              type="button"
+              onClick={handleScrollLeft}
+              className="p-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              title="Scroll left"
+              aria-label="Scroll vans left"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleScrollRight}
+              className="p-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              title="Scroll right"
+              aria-label="Scroll vans right"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {/* Scrollable Container with wheel listener */}
+        <div
+          ref={pillContainerRef}
+          id="fleet-vans-scroll-bar"
+          className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent select-none cursor-ew-resize"
+          title="Scroll with mouse wheel or drag horizontally"
+        >
           {allManagerVehicles.map((v, i) => {
             const isDelayed = v.deliveries.some((d) => d.isDelayed);
             const isSelected = v.id === vehicle.id;
@@ -63,7 +135,7 @@ export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
                 onClick={() => onSelectVehicle(v.id)}
                 className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all border min-h-[44px] ${
                   isSelected
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm ring-1 ring-slate-800'
                     : isDelayed
                     ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -74,7 +146,7 @@ export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
                     isDelayed ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'
                   }`}
                 />
-                <span className="font-mono">{v.carPlate}</span>
+                <span className="font-mono font-bold">{v.carPlate}</span>
                 <span className="text-[11px] opacity-75">({v.deliveries.length}/10)</span>
               </button>
             );
