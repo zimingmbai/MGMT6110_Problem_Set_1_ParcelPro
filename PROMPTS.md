@@ -1,7 +1,7 @@
 # PROMPTS.md - ParcelPro
 **Student:** Lim Zi Ming · **Course:** MGMT 6110 · **Problem Set 1**
 **User sentence:** A Logistics Dispatcher opens this screen to monitor the deliveries status and reassign shipments for a delayed driver, and knows it worked when the icon changes from Red to Green.
-**Live link:** [your Vercel production URL, the short one, tested in a private window]
+**Live link:** https://mgmt-6110-problem-set-1-parcel-pro-six.vercel.app/
 
 ---
 
