@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { MANAGERS, INITIAL_VEHICLES } from './data';
-import { Vehicle, Delivery, Manager } from './types';
+import { Vehicle, Delivery, Manager, TransitStage } from './types';
 import { Header } from './components/Header';
 import { SingaporeMap } from './components/SingaporeMap';
 import { VehicleDetails } from './components/VehicleDetails';
@@ -94,6 +94,13 @@ export default function App() {
       const deliveryToMove = sourceVeh.deliveries.find((d) => d.id === deliveryId);
       if (!deliveryToMove) return prevVehicles;
 
+      // Rule: Inside the list of deliveries for each vehicle, the current delivery (in transit) cannot be reassigned.
+      const isCurrentDelivery = Boolean(deliveryToMove.isInTransit || sourceVeh.deliveries[0]?.id === deliveryId);
+      if (isCurrentDelivery) {
+        showToast('Reassignment Blocked', 'The current delivery the driver is in transit with cannot be reassigned.', 'info');
+        return prevVehicles;
+      }
+
       // Updated target deliveries: add the reassigned delivery, reset delayed status
       const updatedDelivery: Delivery = {
         ...deliveryToMove,
@@ -153,6 +160,37 @@ export default function App() {
     setReassignData(null);
   };
 
+  // Handler to update delivery transit progress stage: 1) Picking Up 2) In Transit 3) Delivered
+  const handleUpdateTransitStage = (
+    vehicleId: string,
+    deliveryId: string,
+    newStage: TransitStage
+  ) => {
+    setVehicles((prevVehicles) =>
+      prevVehicles.map((v) => {
+        if (v.id !== vehicleId) return v;
+        return {
+          ...v,
+          deliveries: v.deliveries.map((d) => {
+            if (d.id !== deliveryId) return d;
+            return {
+              ...d,
+              transitStage: newStage,
+              // If marked Delivered, update status to completed and clear delayed
+              status: newStage === 'Delivered' ? 'completed' : d.status,
+              isDelayed: newStage === 'Delivered' ? false : d.isDelayed,
+            };
+          }),
+        };
+      })
+    );
+    showToast(
+      'Delivery Progress Updated',
+      `Stage updated to "${newStage}".`,
+      'info'
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans antialiased">
       {/* Top Header */}
@@ -207,6 +245,7 @@ export default function App() {
                 onPhoneClick={(veh) => setPhoneVehicle(veh)}
                 onMessageClick={(veh) => setMessageVehicle(veh)}
                 onReassignClick={(del, veh) => setReassignData({ delivery: del, vehicle: veh })}
+                onUpdateTransitStage={handleUpdateTransitStage}
               />
             )}
           </div>
@@ -221,6 +260,7 @@ export default function App() {
               onPhoneClick={(veh) => setPhoneVehicle(veh)}
               onMessageClick={(veh) => setMessageVehicle(veh)}
               onReassignClick={(del, veh) => setReassignData({ delivery: del, vehicle: veh })}
+              onUpdateTransitStage={handleUpdateTransitStage}
               onViewOnMap={(vehId) => {
                 setSelectedVehicleId(vehId);
                 setActiveScreen('map');

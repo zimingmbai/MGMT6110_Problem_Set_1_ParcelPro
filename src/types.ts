@@ -1,4 +1,5 @@
 export type DeliveryStatus = 'in_transit' | 'scheduled' | 'completed' | 'delayed';
+export type TransitStage = 'Picking Up' | 'In Transit' | 'Delivered';
 
 export interface Delivery {
   id: string;
@@ -12,6 +13,7 @@ export interface Delivery {
   status: DeliveryStatus;
   isDelayed: boolean;
   isInTransit?: boolean;
+  transitStage?: TransitStage;
   sequence: number; // 1 to 10 sequence
   notes?: string;
 }

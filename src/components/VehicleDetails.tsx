@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { Vehicle, Delivery } from '../types';
+import { Vehicle, Delivery, TransitStage } from '../types';
+import { DeliveryProgressBar } from './DeliveryProgressBar';
 import {
   Car,
   User,
@@ -17,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Disc,
+  Lock,
 } from 'lucide-react';
 
 interface VehicleDetailsProps {
@@ -26,6 +28,7 @@ interface VehicleDetailsProps {
   onPhoneClick: (vehicle: Vehicle) => void;
   onMessageClick: (vehicle: Vehicle) => void;
   onReassignClick: (delivery: Delivery, vehicle: Vehicle) => void;
+  onUpdateTransitStage?: (vehicleId: string, deliveryId: string, stage: TransitStage) => void;
 }
 
 export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
@@ -35,6 +38,7 @@ export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
   onPhoneClick,
   onMessageClick,
   onReassignClick,
+  onUpdateTransitStage,
 }) => {
   const hasDelayedDelivery = vehicle.deliveries.some((d) => d.isDelayed);
   const deliveryCount = vehicle.deliveries.length;
@@ -304,7 +308,11 @@ export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
                   key={delivery.id}
                   id={`delivery-item-${delivery.id}`}
                   className={`rounded-xl border p-4 transition-all ${
-                    isDelayed
+                    isInTransit
+                      ? isDelayed
+                        ? 'border-rose-300 bg-rose-50/40 shadow-xs ring-2 ring-rose-200/60'
+                        : 'border-blue-300 bg-blue-50/30 shadow-xs ring-2 ring-blue-100'
+                      : isDelayed
                       ? 'border-rose-300 bg-rose-50/40 shadow-xs'
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
@@ -312,12 +320,21 @@ export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
                   {/* Delivery Item Header */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-slate-900 text-[11px] font-bold text-white">
+                      <span
+                        className={`flex h-6 w-6 items-center justify-center rounded-md text-[11px] font-bold text-white ${
+                          isInTransit ? 'bg-blue-600' : 'bg-slate-900'
+                        }`}
+                      >
                         {index + 1}
                       </span>
                       <h4 className="text-sm sm:text-base font-bold text-slate-900">
                         {delivery.item}
                       </h4>
+                      {isInTransit && (
+                        <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                          Active In-Transit
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -333,23 +350,49 @@ export const VehicleDetails: React.FC<VehicleDetailsProps> = ({
                         </span>
                       )}
 
-                      {/* 2) Reassignment Button for Each Delivery */}
-                      <button
-                        id={`reassign-btn-${delivery.id}`}
-                        type="button"
-                        onClick={() => onReassignClick(delivery, vehicle)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs min-h-[38px] ${
-                          isDelayed
-                            ? 'bg-amber-600 text-white hover:bg-amber-700 active:bg-amber-800'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
-                        }`}
-                        title="Reassign this delivery to an available on-time vehicle"
-                      >
-                        <ArrowRightLeft className="h-3.5 w-3.5" />
-                        <span>Reassign Delivery</span>
-                      </button>
+                      {/* Reassignment Control: Current In-Transit Delivery CANNOT be reassigned */}
+                      {isInTransit ? (
+                        <div
+                          id={`reassign-locked-${delivery.id}`}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none min-h-[38px]"
+                          title="The current delivery that the driver is in transit with cannot be reassigned."
+                        >
+                          <Lock className="h-3.5 w-3.5 text-slate-400" />
+                          <span>In Transit (Cannot Reassign)</span>
+                        </div>
+                      ) : (
+                        <button
+                          id={`reassign-btn-${delivery.id}`}
+                          type="button"
+                          onClick={() => onReassignClick(delivery, vehicle)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs min-h-[38px] ${
+                            isDelayed
+                              ? 'bg-amber-600 text-white hover:bg-amber-700 active:bg-amber-800'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
+                          }`}
+                          title="Reassign this subsequent delivery to an available on-time vehicle"
+                        >
+                          <ArrowRightLeft className="h-3.5 w-3.5" />
+                          <span>Reassign Delivery</span>
+                        </button>
+                      )}
                     </div>
                   </div>
+
+                  {/* Progress Bar for Current Delivery with stages: 1) Picking Up, 2) In Transit, 3) Delivered */}
+                  {isInTransit && (
+                    <div className="mb-3">
+                      <DeliveryProgressBar
+                        currentStage={delivery.transitStage || 'In Transit'}
+                        isDelayed={isDelayed}
+                        onSelectStage={
+                          onUpdateTransitStage
+                            ? (newStage) => onUpdateTransitStage(vehicle.id, delivery.id, newStage)
+                            : undefined
+                        }
+                      />
+                    </div>
+                  )}
 
                   {/* Pickup & Dropoff Details */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">

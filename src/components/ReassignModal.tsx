@@ -31,8 +31,10 @@ export const ReassignModal: React.FC<ReassignModalProps> = ({
   const isVehicleDelayed = (v: Vehicle) => v.deliveries.some((d) => d.isDelayed);
   const isVehicleFull = (v: Vehicle) => v.deliveries.length >= 10;
 
+  const isCurrentDelivery = Boolean(delivery.isInTransit || sourceVehicle.deliveries[0]?.id === delivery.id);
+
   const handleConfirm = () => {
-    if (!selectedTargetVehicleId) return;
+    if (!selectedTargetVehicleId || isCurrentDelivery) return;
     onConfirmReassign(delivery.id, sourceVehicle.id, selectedTargetVehicleId);
     setSelectedTargetVehicleId(null);
   };
@@ -73,6 +75,15 @@ export const ReassignModal: React.FC<ReassignModalProps> = ({
 
         {/* Scrollable Body */}
         <div className="overflow-y-auto py-4 space-y-4 pr-1">
+          {isCurrentDelivery && (
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
+              <ShieldAlert className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
+              <div>
+                <strong className="font-bold">Current Delivery Cannot Be Reassigned:</strong> The driver is already in transit with this parcel. Only subsequent deliveries can be reassigned to prevent cascading delays.
+              </div>
+            </div>
+          )}
+
           {/* Active Delivery Summary */}
           <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
             <div className="flex items-center justify-between gap-2 mb-2">
@@ -248,7 +259,7 @@ export const ReassignModal: React.FC<ReassignModalProps> = ({
             id="confirm-reassignment-btn"
             type="button"
             onClick={handleConfirm}
-            disabled={!selectedTargetVehicleId}
+            disabled={!selectedTargetVehicleId || isCurrentDelivery}
             className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-md transition-colors min-h-[44px]"
           >
             <CheckCircle className="h-4 w-4" />
