@@ -1,6 +1,8 @@
 # PROMPTS.md - ParcelPro
 **Student:** Lim Zi Ming · **Course:** MGMT 6110 · **Problem Set 1**
-**User sentence:** A Logistics Dispatcher opens this screen to monitor the deliveries status and reassign shipments for a delayed driver, and knows it worked when the icon changes from Red to Green.
+
+**User sentence:** A Logistics Dispatcher opens this screen to monitor the deliveries status and reassign deliveries for a delayed driver, and knows it worked when the icon changes from Red to Green.
+
 **Live link:** https://mgmt-6110-problem-set-1-parcel-pro-six.vercel.app/
 
 ---
@@ -45,6 +47,7 @@ It also added a the following that I never asked for:
 - Quick Template Responses when sending text
 - 10-van quick-scroll pill bar directly above the vehicle details section
 - Delivery Delay Reasons
+
 **What I changed next and why:** 
 - A button to scroll through the 10-van quick-scroll pill bar > Scrolling function is not available 
 - More seamless map view > Currently is a mix of polygons and hence a less readable interface
@@ -67,7 +70,8 @@ Change nothing else. If you make a choice I did not specify, say so in one line 
 **What came back:** Changes are roughly what was required
 - Scroll-Wheel added > But also added a "Scroll wheel enabled" indicator, which is redundant
 - Live Date/Time is added
-- A more seamless map is added > This seems to be considerably difficult as the visual interpretations might not be sufficient with prompts.
+- A more seamless map is added > This seems to be considerably difficult as the visual interpretations of a map might be difficult to achieve with prompts.
+
 **What I changed next and why:**
 - Add a rule that the current delivery cannot be reassigned > If a driver is in transit with a delivery, reallocating it would be operationally difficult. e.g. the driver would need to pass the item to another driver. The reassignment attempts to prevent a single delay from snowballing into other deliveries.
 ---
@@ -85,6 +89,7 @@ Change nothing else. If you make a choice I did not specify, say so in one line 
 - Added Reassignment Lock for current delivery
 - Added Progress Bar for current delivery
 - Added but not asked - the option for dispatch managers to update delivery status
-    - Does not seem useful as it should take the updates from the Drivers. In cases whereby connection is poor, there might be a use case for function  
+    - Does not seem useful as it should take the updates from the Drivers. In cases whereby connection is poor, there might be a use case for this function  
+
 **What I changed next and why:** NA
 
