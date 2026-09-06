@@ -51,7 +51,7 @@ It also added a the following that I never asked for:
 - Include the current Date/Time at the top header > To be a reference point for the delivery timings
 ---
 
-## Prompt 2 - fix the empty state
+## Prompt 2 - fix the aesthetics
 ```
 Make the following edits
 
@@ -68,8 +68,23 @@ Change nothing else. If you make a choice I did not specify, say so in one line 
 - Scroll-Wheel added > But also added a "Scroll wheel enabled" indicator, which is redundant
 - Live Date/Time is added
 - A more seamless map is added > This seems to be considerably difficult as the visual interpretations might not be sufficient with prompts.
-**What I changed next and why:** Nothing. Moved to the next item on the Goal list.
-
+**What I changed next and why:**
+- Add a rule that the current delivery cannot be reassigned > If a driver is in transit with a delivery, reallocating it would be operationally difficult. e.g. the driver would need to pass the item to another driver. The reassignment attempts to prevent a single delay from snowballing into other deliveries.
 ---
 
-## Prompt 3 - [and so on, one entry per prompt, in order]
+## Prompt 3 - update the reassignment rule
+```
+Add the following rule to ParcelPro
+
+- Inside the list of deliveries for each vehicle, the current delivery (i.e. the delivery that the driver is in transit with) cannot be reassigned.
+- The current delivery that the vehicle is in transit with, should also be clearly indicated. We can use a progress bar for the current delivery with the following possible status: 1) Picking Up 2) In Transit 3) Delivered
+
+Change nothing else. If you make a choice I did not specify, say so in one line rather than burying it.
+```
+**What came back:** Changes are roughly what was required
+- Added Reassignment Lock for current delivery
+- Added Progress Bar for current delivery
+- Added but not asked - the option for dispatch managers to update delivery status
+    - Does not seem useful as it should take the updates from the Drivers. In cases whereby connection is poor, there might be a use case for function  
+**What I changed next and why:** NA
+
