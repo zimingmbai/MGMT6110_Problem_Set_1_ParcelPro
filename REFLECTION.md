@@ -77,5 +77,7 @@
     - There needs to be a PIC that is well versed with what was built, the code behind it, as well as the intentions behind each prompt.
 - The Product Team should document most (if not all) interactions with AI
     - The documentation shows the chain of thought during the product creation, what was expected/unexpected, which helps to prevent the intent of the product from shifting over time.
+    - With multiple prompts, it is easy to lose track of why we sent a certain prompt, this will keep us grounded on the product objective.
 - Give employees a clear list of guidelines on what can and cannot be entered into a prompt
     - Sensitive information should not be used, as it could be hidden within the code and risk being revealed, even though a product could be a prototype.
+    - With a master prompt, the builder already tends to add features that were not mentioned. If there are no guidelines, we would be consuming resources without having a usable prototype.
