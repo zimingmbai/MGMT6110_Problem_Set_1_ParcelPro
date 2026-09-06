@@ -1,3 +1,11 @@
+# REFLECTION.md - ParcelPro
+**Student:** Lim Zi Ming · **Course:** MGMT 6110 · **Problem Set 1**
+
+**User sentence:** A Logistics Dispatcher opens this screen to monitor the deliveries status and reassign deliveries for a delayed driver, and knows it worked when the icon changes from Red to Green.
+
+**Live link:** https://mgmt-6110-problem-set-1-parcel-pro-six.vercel.app/
+
+---
 ## Q1 - Who are your users, and what changes for them?
 
 **Users**: Dispatch Managers of a Logistics Company (i.e. Internal Users)
